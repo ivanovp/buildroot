@@ -4,7 +4,7 @@
 #
 
 #
-# Compiler: arm-buildroot-linux-uclibcgnueabi-gcc.br_real (Buildroot 2019.11-git-01090-g0c6d1e5a63) 8.3.0
+# Compiler: arm-buildroot-linux-uclibcgnueabi-gcc.br_real (Buildroot 2019.11-git-01093-gcdce2d43dd-dirty) 8.3.0
 #
 CONFIG_CC_IS_GCC=y
 CONFIG_GCC_VERSION=80300
