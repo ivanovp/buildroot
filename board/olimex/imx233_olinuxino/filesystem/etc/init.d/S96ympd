@@ -4,17 +4,19 @@ HOST="localhost"
 PORT=6600
 # default is 8080
 WEB_PORT=80
+PIDFILE="/var/run/ympd.pid"
 [ -r "/etc/default/$DAEMON" ] && . "/etc/default/$DAEMON"
 
 start() {
 	printf "Starting ympd: "
-	start-stop-daemon --start --quiet --background --exec "/usr/bin/ympd -h $HOST -p $PORT -w $WEB_PORT" \
+	start-stop-daemon --start --quiet --background -m -p $PIDFILE \
+		--exec "/usr/bin/ympd" -- -h $HOST -p $PORT -w $WEB_PORT \
 		&& echo "OK" || echo "FAIL"
 }
 
 stop() {
 	printf "Stopping ympd: "
-	start-stop-daemon --stop --quiet --pidfile /var/run/ympd.pid \
+	start-stop-daemon --stop --quiet -p $PIDFILE \
 		&& echo "OK" || echo "FAIL"
 }
 
