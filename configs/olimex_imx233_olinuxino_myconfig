@@ -1,6 +1,6 @@
 #
 # Automatically generated file; DO NOT EDIT.
-# Buildroot 2019.11-git-01095-gaa81f8a540 Configuration
+# Buildroot 2019.11-git-01096-gfd6edcf5d0-dirty Configuration
 #
 BR2_HAVE_DOT_CONFIG=y
 BR2_HOST_GCC_AT_LEAST_4_5=y
@@ -651,7 +651,7 @@ BR2_PACKAGE_MPD_SQLITE=y
 # Converter plugins
 #
 # BR2_PACKAGE_MPD_LIBSAMPLERATE is not set
-# BR2_PACKAGE_MPD_LIBSOXR is not set
+BR2_PACKAGE_MPD_LIBSOXR=y
 
 #
 # Decoder plugins
@@ -1817,7 +1817,7 @@ BR2_PACKAGE_LIBSAMPLERATE=y
 # BR2_PACKAGE_LIBSILK is not set
 BR2_PACKAGE_LIBSNDFILE=y
 # BR2_PACKAGE_LIBSOUNDTOUCH is not set
-# BR2_PACKAGE_LIBSOXR is not set
+BR2_PACKAGE_LIBSOXR=y
 # BR2_PACKAGE_LIBVORBIS is not set
 # BR2_PACKAGE_MP4V2 is not set
 BR2_PACKAGE_OPENAL_ARCH_SUPPORTS=y
