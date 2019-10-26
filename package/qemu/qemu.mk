@@ -97,11 +97,25 @@ else
 QEMU_OPTS += --disable-libssh2
 endif
 
+ifeq ($(BR2_PACKAGE_LIBUSB),y)
+QEMU_OPTS += --enable-libusb
+QEMU_DEPENDENCIES += libusb
+else
+QEMU_OPTS += --disable-libusb
+endif
+
 ifeq ($(BR2_PACKAGE_NETTLE),y)
 QEMU_OPTS += --enable-nettle
 QEMU_DEPENDENCIES += nettle
 else
 QEMU_OPTS += --disable-nettle
+endif
+
+ifeq ($(BR2_PACKAGE_NUMACTL),y)
+QEMU_OPTS += --enable-numa
+QEMU_DEPENDENCIES += numactl
+else
+QEMU_OPTS += --disable-numa
 endif
 
 # Override CPP, as it expects to be able to call it like it'd
@@ -262,6 +276,13 @@ HOST_QEMU_OPTS += --enable-virtfs
 HOST_QEMU_DEPENDENCIES += host-libcap
 else
 HOST_QEMU_OPTS += --disable-virtfs
+endif
+
+ifeq ($(BR2_PACKAGE_HOST_QEMU_USB),y)
+HOST_QEMU_OPTS += --enable-libusb
+HOST_QEMU_DEPENDENCIES += host-libusb
+else
+HOST_QEMU_OPTS += --disable-libusb
 endif
 
 # Override CPP, as it expects to be able to call it like it'd

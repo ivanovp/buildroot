@@ -114,6 +114,10 @@ endif
 
 TOOLCHAIN_EXTERNAL_LIBS += ld*.so* libgcc_s.so.* libatomic.so.*
 
+ifneq ($(BR2_SSP_NONE),y)
+TOOLCHAIN_EXTERNAL_LIBS += libssp.so.*
+endif
+
 ifeq ($(BR2_TOOLCHAIN_EXTERNAL_GLIBC)$(BR2_TOOLCHAIN_EXTERNAL_UCLIBC),y)
 TOOLCHAIN_EXTERNAL_LIBS += libc.so.* libcrypt.so.* libdl.so.* libm.so.* libnsl.so.* libresolv.so.* librt.so.* libutil.so.*
 ifeq ($(BR2_TOOLCHAIN_HAS_THREADS),y)
@@ -146,6 +150,10 @@ endif
 
 ifeq ($(BR2_TOOLCHAIN_HAS_OPENMP),y)
 TOOLCHAIN_EXTERNAL_LIBS += libgomp.so.*
+endif
+
+ifeq ($(BR2_TOOLCHAIN_HAS_DLANG),y)
+TOOLCHAIN_EXTERNAL_LIBS += libgdruntime.so* libgphobos.so*
 endif
 
 TOOLCHAIN_EXTERNAL_LIBS += $(call qstrip,$(BR2_TOOLCHAIN_EXTRA_EXTERNAL_LIBS))

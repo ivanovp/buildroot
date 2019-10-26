@@ -12,11 +12,13 @@ OFONO_LICENSE_FILES = COPYING
 OFONO_DEPENDENCIES = \
 	host-pkgconf \
 	dbus \
-	libglib2 \
+	ell \
 	libcap-ng \
+	libglib2 \
 	mobile-broadband-provider-info
 
 OFONO_CONF_OPTS = \
+	--enable-external-ell \
 	--disable-test \
 	--with-dbusconfdir=/etc \
 	$(if $(BR2_INIT_SYSTEMD),--with-systemdunitdir=/usr/lib/systemd/system)
@@ -48,8 +50,5 @@ OFONO_DEPENDENCIES += bluez_utils
 else
 OFONO_CONF_OPTS += --disable-bluetooth
 endif
-
-# required by 0003-build-Add-check-for-explicit_bzero-support.patch
-OFONO_AUTORECONF = YES
 
 $(eval $(autotools-package))

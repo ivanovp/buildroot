@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-IWD_VERSION = 0.18
+IWD_VERSION = 0.22
 IWD_SITE = https://git.kernel.org/pub/scm/network/wireless/iwd.git
 IWD_SITE_METHOD = git
 IWD_LICENSE = LGPL-2.1+
@@ -12,7 +12,9 @@ IWD_LICENSE_FILES = COPYING
 # sources from git, no configure script provided
 IWD_AUTORECONF = YES
 
-IWD_CONF_OPTS = --enable-external-ell
+IWD_CONF_OPTS = \
+	--disable-manual-pages \
+	--enable-external-ell
 IWD_DEPENDENCIES = ell
 
 # autoreconf requires an existing build-aux directory

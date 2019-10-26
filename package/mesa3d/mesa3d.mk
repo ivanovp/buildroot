@@ -5,7 +5,7 @@
 ################################################################################
 
 # When updating the version, please also update mesa3d-headers
-MESA3D_VERSION = 19.2.1
+MESA3D_VERSION = 19.2.2
 MESA3D_SOURCE = mesa-$(MESA3D_VERSION).tar.xz
 MESA3D_SITE = https://mesa.freedesktop.org/archive
 MESA3D_LICENSE = MIT, SGI, Khronos
@@ -217,7 +217,7 @@ MESA3D_CONF_OPTS += -Dgles1=false -Dgles2=false
 endif
 
 ifeq ($(BR2_PACKAGE_MESA3D_XVMC),y)
-MESA3D_DEPENDENCIES += xlib_libXvMC
+MESA3D_DEPENDENCIES += xlib_libXv xlib_libXvMC
 MESA3D_CONF_OPTS += -Dgallium-xvmc=true
 else
 MESA3D_CONF_OPTS += -Dgallium-xvmc=false
