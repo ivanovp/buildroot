@@ -3,7 +3,7 @@ DAEMON="ympd"
 HOST="localhost"
 PORT=6600
 # default is 8080
-WEB_PORT=80
+WEB_PORT=8080
 PIDFILE="/var/run/ympd.pid"
 [ -r "/etc/default/$DAEMON" ] && . "/etc/default/$DAEMON"
 
