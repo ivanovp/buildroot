@@ -2,7 +2,7 @@
 # Menu for internet radio
 #
 # Code starts: 2019-10-23 13:30:57
-# Last modify: 2019-10-29 19:50:41 ivanovp {Time-stamp}
+# Last modify: 2019-10-30 18:49:12 ivanovp {Time-stamp}
 
 import mpd
 import time
@@ -14,7 +14,7 @@ import getopt
 #import array
 import serial
 
-LAST_UPDATE_STR = "Last update: 2019-10-29 19:50:41 ivanovp {Time-stamp}"
+LAST_UPDATE_STR = "Last update: 2019-10-30 18:49:12 ivanovp {Time-stamp}"
 
 if sys.hexversion >= 0x3000000:
     print "Python interpreter 2.x is needed."
@@ -37,6 +37,7 @@ class MenuControl:
     FONT_WIDE           = 0x01
     FONT_MEDIUM_NUMBERS = 0x02
     FONT_BIG_NUMBERS    = 0x03
+    FONT_NORMAL_NUMBERS = 0x04
 
     def __init__ (self, port=SERIAL_PORT, serial_=None, debugLevel=10):
         self.debugLevel = debugLevel
@@ -255,8 +256,18 @@ Switches:
                 #self.menu.printStr(0, 8, titleTxt)
             print timeTxt,
             print titleTxt,
-            self.menu.setFont(self.menu.FONT_BIG_NUMBERS)
-            self.menu.printStr(0, 0, timeTxt)
+            if len (timeTxt) <= 9:
+                self.menu.setFont(self.menu.FONT_BIG_NUMBERS)
+                self.menu.printStr(0, 0, timeTxt)
+            elif len (timeTxt) <= 10:
+                self.menu.setFont(self.menu.FONT_MEDIUM_NUMBERS)
+                self.menu.printStr(0, 4, timeTxt)
+            elif len (timeTxt) <= 12:
+                self.menu.setFont(self.menu.FONT_NORMAL_NUMBERS)
+                self.menu.printStr(0, 4, timeTxt)
+            else:
+                self.menu.setFont(self.menu.FONT_SMALL)
+                self.menu.printStr(0, 4, timeTxt)
             prevTitleTxt = titleTxt
             #print filename, name, title,
 
