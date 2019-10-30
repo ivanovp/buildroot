@@ -2,7 +2,7 @@
 # Menu for internet radio
 #
 # Code starts: 2019-10-23 13:30:57
-# Last modify: 2019-10-30 20:02:22 ivanovp {Time-stamp}
+# Last modify: 2019-10-30 20:57:30 ivanovp {Time-stamp}
 
 import mpd
 import time
@@ -14,14 +14,14 @@ import getopt
 #import array
 import serial
 
-LAST_UPDATE_STR = "Last update: 2019-10-30 20:02:22 ivanovp {Time-stamp}"
+LAST_UPDATE_STR = "Last update: 2019-10-30 20:57:30 ivanovp {Time-stamp}"
 
 if sys.hexversion >= 0x3000000:
     print "Python interpreter 2.x is needed."
     sys.exit (3)
 
 class MenuControl:
-    SERIAL_TIMEOUT_SEC = 0.5
+    SERIAL_TIMEOUT_SEC = 0.1
     SERIAL_PORT = "/dev/ttyAPP0"
     SERIAL_BAUD_RATE = 115200
     # Commands for LCD
@@ -117,6 +117,10 @@ class MenuControl:
 
     def printStr(self, x, y, string):
         cmd = "P%03i,%03i,%s" % (x, y, string)
+        return self.sendCommand(cmd)
+
+    def setVolume(self, volume):
+        cmd = "V%03i" % volume
         return self.sendCommand(cmd)
     
 class App:
@@ -214,9 +218,19 @@ Switches:
         timeTxt = ""
         titleTxt = ""
         prevTitleTxt = ""
+        status = self.mpdclient.status()
+        if 'volume' in status:
+            self.menu.setVolume(int(status['volume']))
         while True:
             #self.mpdclient.idle()
-            time.sleep(0.1)
+            end = False
+            while not end:
+                vol = self.menu.serial.read(4)
+                if len(vol) > 0 and vol[0] == 'V':
+                    print "\nvolume", vol
+                else:
+                    end = True
+            #time.sleep(0.1)
             song = self.mpdclient.currentsong()
             status = self.mpdclient.status()
             if 'elapsed' in status:
