@@ -2,7 +2,7 @@
 # Menu for internet radio
 #
 # Code starts: 2019-10-23 13:30:57
-# Last modify: 2019-10-30 18:49:12 ivanovp {Time-stamp}
+# Last modify: 2019-10-30 20:02:22 ivanovp {Time-stamp}
 
 import mpd
 import time
@@ -14,7 +14,7 @@ import getopt
 #import array
 import serial
 
-LAST_UPDATE_STR = "Last update: 2019-10-30 18:49:12 ivanovp {Time-stamp}"
+LAST_UPDATE_STR = "Last update: 2019-10-30 20:02:22 ivanovp {Time-stamp}"
 
 if sys.hexversion >= 0x3000000:
     print "Python interpreter 2.x is needed."
@@ -225,17 +225,16 @@ Switches:
             else:
                 elapsed_min = 0
                 elapsed_sec = 0
-            if 'file' in song:
-                filename = song['file']
-            else:
-                filename = ">> END OF PLAYLIST <<"
-            print "\r",
             if 'duration' in status:
                 duration_min = float (status['duration']) / 60
                 duration_sec = float (status['duration']) % 60
                 timeTxt = "%i:%02i/%i:%02i" % (elapsed_min, elapsed_sec, duration_min, duration_sec)
             else:
                 timeTxt = "%i:%02i" % (elapsed_min, elapsed_sec)
+            if 'file' in song:
+                filename = song['file']
+            else:
+                filename = ">> END OF PLAYLIST <<"
             if 'name' in song:
                 name = song['name']
             else:
@@ -248,27 +247,38 @@ Switches:
                 titleTxt = filename
             else:
                 titleTxt = name + ": " + title
+            if len (titleTxt) < 21 * 4:
+#                titleTxt += " " * (21 * 4 - len (titleTxt))
+                pass
+            else:
+                titleTxt = titleTxt[:21 * 4]
             if titleTxt != prevTitleTxt:
                 print ""
+                # clear needed if font size changed!
                 self.menu.clearScreen()
                 self.menu.setFont(self.menu.FONT_SMALL)
                 self.menu.printStr(0, 25, titleTxt)
                 #self.menu.printStr(0, 8, titleTxt)
-            print timeTxt,
-            print titleTxt,
+            else:
+                print "\r",
             if len (timeTxt) <= 9:
                 self.menu.setFont(self.menu.FONT_BIG_NUMBERS)
+                timeTxt += " " * (9 - len (timeTxt))
                 self.menu.printStr(0, 0, timeTxt)
-            elif len (timeTxt) <= 10:
-                self.menu.setFont(self.menu.FONT_MEDIUM_NUMBERS)
-                self.menu.printStr(0, 4, timeTxt)
+#           elif len (timeTxt) <= 10:
+#               self.menu.setFont(self.menu.FONT_MEDIUM_NUMBERS)
+#                timeTxt += " " * (10 - len (timeTxt))
+#               self.menu.printStr(0, 4, timeTxt)
             elif len (timeTxt) <= 12:
                 self.menu.setFont(self.menu.FONT_NORMAL_NUMBERS)
+                timeTxt += " " * (12 - len (timeTxt))
                 self.menu.printStr(0, 4, timeTxt)
             else:
                 self.menu.setFont(self.menu.FONT_SMALL)
                 self.menu.printStr(0, 4, timeTxt)
             prevTitleTxt = titleTxt
+            print timeTxt,
+            print titleTxt,
             #print filename, name, title,
 
 if __name__ == "__main__":
