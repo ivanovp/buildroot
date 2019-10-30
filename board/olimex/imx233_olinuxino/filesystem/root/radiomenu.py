@@ -2,7 +2,7 @@
 # Menu for internet radio
 #
 # Code starts: 2019-10-23 13:30:57
-# Last modify: 2019-10-27 21:33:04 ivanovp {Time-stamp}
+# Last modify: 2019-10-29 19:50:41 ivanovp {Time-stamp}
 
 import mpd
 import time
@@ -14,7 +14,7 @@ import getopt
 #import array
 import serial
 
-LAST_UPDATE_STR = "Last update: 2019-10-27 21:33:04 ivanovp {Time-stamp}"
+LAST_UPDATE_STR = "Last update: 2019-10-29 19:50:41 ivanovp {Time-stamp}"
 
 if sys.hexversion >= 0x3000000:
     print "Python interpreter 2.x is needed."
@@ -32,6 +32,11 @@ class MenuControl:
     ANSWER_OK                           = 0x55
     ANSWER_ERROR                        = 0x5A
     NO_ANSWER                           = 0xAA
+
+    FONT_SMALL          = 0x00
+    FONT_WIDE           = 0x01
+    FONT_MEDIUM_NUMBERS = 0x02
+    FONT_BIG_NUMBERS    = 0x03
 
     def __init__ (self, port=SERIAL_PORT, serial_=None, debugLevel=10):
         self.debugLevel = debugLevel
@@ -79,7 +84,7 @@ class MenuControl:
     def sendCommand (self, command):
         answer = 0
         if self.serial is not None and self.serial.isOpen ():
-            cmd = command.encode()
+            cmd = command.encode('utf-8')
             #print "\r\n[%s]\r\n" % cmd
             self.serial.write (cmd + "\n")
             time.sleep (0.001)
@@ -105,6 +110,9 @@ class MenuControl:
 
     def clearScreen(self):
         return self.sendCommand("C")
+    
+    def setFont(self, font=FONT_SMALL):
+        return self.sendCommand("F%i" % font)
 
     def printStr(self, x, y, string):
         cmd = "P%03i,%03i,%s" % (x, y, string)
@@ -210,9 +218,16 @@ Switches:
             time.sleep(0.1)
             song = self.mpdclient.currentsong()
             status = self.mpdclient.status()
-            elapsed_min = float (status['elapsed']) / 60
-            elapsed_sec = float (status['elapsed']) % 60
-            filename = song['file']
+            if 'elapsed' in status:
+                elapsed_min = float (status['elapsed']) / 60
+                elapsed_sec = float (status['elapsed']) % 60
+            else:
+                elapsed_min = 0
+                elapsed_sec = 0
+            if 'file' in song:
+                filename = song['file']
+            else:
+                filename = ">> END OF PLAYLIST <<"
             print "\r",
             if 'duration' in status:
                 duration_min = float (status['duration']) / 60
@@ -235,9 +250,12 @@ Switches:
             if titleTxt != prevTitleTxt:
                 print ""
                 self.menu.clearScreen()
-                self.menu.printStr(0, 8, titleTxt)
+                self.menu.setFont(self.menu.FONT_SMALL)
+                self.menu.printStr(0, 25, titleTxt)
+                #self.menu.printStr(0, 8, titleTxt)
             print timeTxt,
             print titleTxt,
+            self.menu.setFont(self.menu.FONT_BIG_NUMBERS)
             self.menu.printStr(0, 0, timeTxt)
             prevTitleTxt = titleTxt
             #print filename, name, title,
