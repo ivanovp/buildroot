@@ -1,0 +1,35 @@
+#!/bin/sh
+DAEMON="bluetoothd"
+EXEC="/usr/libexec/bluetooth/$DAEMON"
+PIDFILE="/var/run/$DAEMON.pid"
+[ -r "/etc/default/$DAEMON" ] && . "/etc/default/$DAEMON"
+
+start() {
+	printf "Starting $DAEMON: "
+	start-stop-daemon --start --quiet --background -m -p $PIDFILE \
+		--exec $EXEC -- \
+		&& echo "OK" || echo "FAIL"
+}
+
+stop() {
+	printf "Stopping $DAEMON: "
+	start-stop-daemon --stop --quiet -p $PIDFILE \
+		&& echo "OK" || echo "FAIL"
+}
+
+case "$1" in
+	start)
+		start
+		;;
+	stop)
+		stop
+		;;
+	restart|reload)
+		stop
+		sleep 1
+		start
+		;;
+	*)
+		echo "Usage: $0 {start|stop|restart}"
+		exit 1
+esac
