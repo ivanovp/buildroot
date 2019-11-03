@@ -2,7 +2,7 @@
 # Menu for internet radio
 #
 # Code starts: 2019-10-23 13:30:57
-# Last modify: 2019-10-30 20:57:30 ivanovp {Time-stamp}
+# Last modify: 2019-11-03 21:39:19 ivanovp {Time-stamp}
 
 import mpd
 import time
@@ -14,7 +14,7 @@ import getopt
 #import array
 import serial
 
-LAST_UPDATE_STR = "Last update: 2019-10-30 20:57:30 ivanovp {Time-stamp}"
+LAST_UPDATE_STR = "Last update: 2019-11-03 21:39:19 ivanovp {Time-stamp}"
 
 if sys.hexversion >= 0x3000000:
     print "Python interpreter 2.x is needed."
@@ -23,7 +23,8 @@ if sys.hexversion >= 0x3000000:
 class MenuControl:
     SERIAL_TIMEOUT_SEC = 0.1
     SERIAL_PORT = "/dev/ttyAPP0"
-    SERIAL_BAUD_RATE = 115200
+#    SERIAL_BAUD_RATE = 115200
+    SERIAL_BAUD_RATE = 9600
     # Commands for LCD
     CMD_ECHO_DISABLE                    = "E0"
     CMD_ECHO_ENABLE                     = "E1"
@@ -38,6 +39,9 @@ class MenuControl:
     FONT_MEDIUM_NUMBERS = 0x02
     FONT_BIG_NUMBERS    = 0x03
     FONT_NORMAL_NUMBERS = 0x04
+
+    CODESET = 'iso-8859-2'
+    #CODESET = 'utf-8'
 
     def __init__ (self, port=SERIAL_PORT, serial_=None, debugLevel=10):
         self.debugLevel = debugLevel
@@ -85,7 +89,7 @@ class MenuControl:
     def sendCommand (self, command):
         answer = 0
         if self.serial is not None and self.serial.isOpen ():
-            cmd = command.encode('utf-8')
+            cmd = command.encode(self.CODESET)
             #print "\r\n[%s]\r\n" % cmd
             self.serial.write (cmd + "\n")
             time.sleep (0.001)
@@ -122,6 +126,16 @@ class MenuControl:
     def setVolume(self, volume):
         cmd = "V%03i" % volume
         return self.sendCommand(cmd)
+
+    def getVolume(self):
+        cmd = "G"
+	vol = None
+        volChanged = None
+        if self.sendCommand(cmd):
+            vol = int(self.serial.read(3))
+            volChanged = self.serial.read(1) == "!"
+            self.serial.read(2) # CR, LF
+	return [vol, volChanged]
     
 class App:
     VERSION_STR = "1.0.0"
@@ -131,15 +145,11 @@ class App:
     def __init__ (self):
         self.verboseLevel = 5
         self.serialPort = self.DEFAULT_SERIAL_PORT
+	self.enablePrint = True
 
-#        if len (sys.argv) < 2:
-#            self.usage ()
-#            sys.exit ()
-    
-        cntr = 1
         # Processing remaining switches
         try:
-            opts, args = getopt.getopt(sys.argv[cntr:], "p:hv:", ["port=", "help", "verbose="])
+            opts, args = getopt.getopt(sys.argv[1:], "p:hv:", ["port=", "help", "verbose="])
         except getopt.GetoptError, err:
             # print help information and exit:
             print "Error:", str (err) # will print something like "option -a not recognized"
@@ -221,16 +231,19 @@ Switches:
         status = self.mpdclient.status()
         if 'volume' in status:
             self.menu.setVolume(int(status['volume']))
+	(volume, volumeChanged) = self.menu.getVolume()
+	font = -1
+	prevFont = -1
         while True:
             #self.mpdclient.idle()
             end = False
-            while not end:
-                vol = self.menu.serial.read(4)
-                if len(vol) > 0 and vol[0] == 'V':
-                    print "\nvolume", vol
-                else:
-                    end = True
-            #time.sleep(0.1)
+            #while not end:
+            #    vol = self.menu.serial.read(4)
+            #    if len(vol) > 0 and vol[0] == 'V':
+            #        print "\nvolume", vol
+            #    else:
+            #        end = True
+            time.sleep(0.1)
             song = self.mpdclient.currentsong()
             status = self.mpdclient.status()
             if 'elapsed' in status:
@@ -247,6 +260,10 @@ Switches:
                 timeTxt = "%i:%02i" % (elapsed_min, elapsed_sec)
             if 'file' in song:
                 filename = song['file']
+                # get filename from path
+                slash_pos = filename.rfind('/')
+                if slash_pos >= 0:
+                    filename = filename[slash_pos + 1:]
             else:
                 filename = ">> END OF PLAYLIST <<"
             if 'name' in song:
@@ -261,20 +278,23 @@ Switches:
                 titleTxt = filename
             else:
                 titleTxt = name + ": " + title
-            if len (titleTxt) < 21 * 4:
-#                titleTxt += " " * (21 * 4 - len (titleTxt))
+            maxTitleLen = 21 * 4
+            if len (titleTxt) < maxTitleLen:
+#                titleTxt += " " * (maxTitleLen - len (titleTxt))
                 pass
             else:
-                titleTxt = titleTxt[:21 * 4]
+                titleTxt = titleTxt[:maxTitleLen]
             if titleTxt != prevTitleTxt:
-                print ""
+		if self.enablePrint:
+                    print ""
                 # clear needed if font size changed!
                 self.menu.clearScreen()
                 self.menu.setFont(self.menu.FONT_SMALL)
                 self.menu.printStr(0, 25, titleTxt)
                 #self.menu.printStr(0, 8, titleTxt)
             else:
-                print "\r",
+		if self.enablePrint:
+                    print "\r",
             if len (timeTxt) <= 9:
                 self.menu.setFont(self.menu.FONT_BIG_NUMBERS)
                 timeTxt += " " * (9 - len (timeTxt))
@@ -290,10 +310,16 @@ Switches:
             else:
                 self.menu.setFont(self.menu.FONT_SMALL)
                 self.menu.printStr(0, 4, timeTxt)
-            prevTitleTxt = titleTxt
-            print timeTxt,
-            print titleTxt,
+            (volume, volumeChanged) = self.menu.getVolume()
+            if volumeChanged:
+                print "\r\nsetvol", volume
+                self.mpdclient.setvol (volume)
+            if self.enablePrint:
+		print "%i%%" % volume,
+                print timeTxt.encode('utf-8'),
+                print titleTxt.encode('utf-8'),
             #print filename, name, title,
+            prevTitleTxt = titleTxt
 
 if __name__ == "__main__":
     # make output unbuffered
