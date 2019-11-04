@@ -2,7 +2,7 @@
 # Menu for internet radio
 #
 # Code starts: 2019-10-23 13:30:57
-# Last modify: 2019-11-03 21:39:19 ivanovp {Time-stamp}
+# Last modify: 2019-11-04 17:54:00 ivanovp {Time-stamp}
 
 import mpd
 import time
@@ -14,7 +14,7 @@ import getopt
 #import array
 import serial
 
-LAST_UPDATE_STR = "Last update: 2019-11-03 21:39:19 ivanovp {Time-stamp}"
+LAST_UPDATE_STR = "Last update: 2019-11-04 17:54:00 ivanovp {Time-stamp}"
 
 if sys.hexversion >= 0x3000000:
     print "Python interpreter 2.x is needed."
@@ -228,9 +228,11 @@ Switches:
         timeTxt = ""
         titleTxt = ""
         prevTitleTxt = ""
+        mpdvolume = 0
         status = self.mpdclient.status()
         if 'volume' in status:
             self.menu.setVolume(int(status['volume']))
+            mpdvolume = status['volume']
 	(volume, volumeChanged) = self.menu.getVolume()
 	font = -1
 	prevFont = -1
@@ -291,6 +293,7 @@ Switches:
                 self.menu.clearScreen()
                 self.menu.setFont(self.menu.FONT_SMALL)
                 self.menu.printStr(0, 25, titleTxt)
+                self.menu.setVolume(int(mpdvolume))
                 #self.menu.printStr(0, 8, titleTxt)
             else:
 		if self.enablePrint:
@@ -312,8 +315,13 @@ Switches:
                 self.menu.printStr(0, 4, timeTxt)
             (volume, volumeChanged) = self.menu.getVolume()
             if volumeChanged:
-                print "\r\nsetvol", volume
+                print "\r\nradio->mpd", volume
                 self.mpdclient.setvol (volume)
+            else:
+                if mpdvolume != status['volume']:
+                    mpdvolume = status['volume']
+                    print "\r\nmpd->radio", mpdvolume
+                    self.menu.setVolume(int(mpdvolume))
             if self.enablePrint:
 		print "%i%%" % volume,
                 print timeTxt.encode('utf-8'),
