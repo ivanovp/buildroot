@@ -2,7 +2,7 @@
 # Menu for internet radio
 #
 # Code starts: 2019-10-23 13:30:57
-# Last modify: 2019-11-04 17:54:00 ivanovp {Time-stamp}
+# Last modify: 2019-11-04 20:24:14 ivanovp {Time-stamp}
 
 import mpd
 import time
@@ -14,7 +14,7 @@ import getopt
 #import array
 import serial
 
-LAST_UPDATE_STR = "Last update: 2019-11-04 17:54:00 ivanovp {Time-stamp}"
+LAST_UPDATE_STR = "Last update: 2019-11-04 20:24:14 ivanovp {Time-stamp}"
 
 if sys.hexversion >= 0x3000000:
     print "Python interpreter 2.x is needed."
@@ -226,6 +226,7 @@ Switches:
         title = ""
         filename = ""
         timeTxt = ""
+        prevTimeTxt = ""
         titleTxt = ""
         prevTitleTxt = ""
         mpdvolume = 0
@@ -298,27 +299,30 @@ Switches:
             else:
 		if self.enablePrint:
                     print "\r",
-            if len (timeTxt) <= 9:
-                self.menu.setFont(self.menu.FONT_BIG_NUMBERS)
-                timeTxt += " " * (9 - len (timeTxt))
-                self.menu.printStr(0, 0, timeTxt)
-#           elif len (timeTxt) <= 10:
-#               self.menu.setFont(self.menu.FONT_MEDIUM_NUMBERS)
-#                timeTxt += " " * (10 - len (timeTxt))
-#               self.menu.printStr(0, 4, timeTxt)
-            elif len (timeTxt) <= 12:
-                self.menu.setFont(self.menu.FONT_NORMAL_NUMBERS)
-                timeTxt += " " * (12 - len (timeTxt))
-                self.menu.printStr(0, 4, timeTxt)
-            else:
-                self.menu.setFont(self.menu.FONT_SMALL)
-                self.menu.printStr(0, 4, timeTxt)
+            if timeTxt != prevTimeTxt:
+                if len (timeTxt) <= 9:
+                    self.menu.setFont(self.menu.FONT_BIG_NUMBERS)
+                    timeTxt += " " * (9 - len (timeTxt))
+                    self.menu.printStr(0, 0, timeTxt)
+#               elif len (timeTxt) <= 10:
+#                   self.menu.setFont(self.menu.FONT_MEDIUM_NUMBERS)
+#                    timeTxt += " " * (10 - len (timeTxt))
+#                   self.menu.printStr(0, 4, timeTxt)
+                elif len (timeTxt) <= 12:
+                    self.menu.setFont(self.menu.FONT_NORMAL_NUMBERS)
+                    timeTxt += " " * (12 - len (timeTxt))
+                    self.menu.printStr(0, 4, timeTxt)
+                else:
+                    self.menu.setFont(self.menu.FONT_SMALL)
+                    self.menu.printStr(0, 4, timeTxt)
             (volume, volumeChanged) = self.menu.getVolume()
             if volumeChanged:
+                # volume changed with the knob
                 print "\r\nradio->mpd", volume
                 self.mpdclient.setvol (volume)
             else:
                 if mpdvolume != status['volume']:
+                    # volume changed on mpd
                     mpdvolume = status['volume']
                     print "\r\nmpd->radio", mpdvolume
                     self.menu.setVolume(int(mpdvolume))
@@ -327,6 +331,7 @@ Switches:
                 print timeTxt.encode('utf-8'),
                 print titleTxt.encode('utf-8'),
             #print filename, name, title,
+            prevTimeTxt = timeTxt
             prevTitleTxt = titleTxt
 
 if __name__ == "__main__":
