@@ -2,7 +2,7 @@
 # Menu for internet radio
 #
 # Code starts: 2019-10-23 13:30:57
-# Last modify: 2019-11-04 20:24:14 ivanovp {Time-stamp}
+# Last modify: 2019-11-07 18:45:30 ivanovp {Time-stamp}
 
 import mpd
 import time
@@ -14,7 +14,7 @@ import getopt
 #import array
 import serial
 
-LAST_UPDATE_STR = "Last update: 2019-11-04 20:24:14 ivanovp {Time-stamp}"
+LAST_UPDATE_STR = "Last update: 2019-11-07 18:45:30 ivanovp {Time-stamp}"
 
 if sys.hexversion >= 0x3000000:
     print "Python interpreter 2.x is needed."
@@ -42,6 +42,12 @@ class MenuControl:
 
     CODESET = 'iso-8859-2'
     #CODESET = 'utf-8'
+
+    KEY_STOP    = 4
+    KEY_PLAY    = 8
+    KEY_MENU    = 16
+    KEY_NEXT    = 32
+    KEY_PREV    = 64
 
     def __init__ (self, port=SERIAL_PORT, serial_=None, debugLevel=10):
         self.debugLevel = debugLevel
@@ -136,6 +142,14 @@ class MenuControl:
             volChanged = self.serial.read(1) == "!"
             self.serial.read(2) # CR, LF
 	return [vol, volChanged]
+
+    def getKey(self):
+        cmd = "K"
+	key = None
+        if self.sendCommand(cmd):
+            key = int(self.serial.read(3))
+            self.serial.read(2) # CR, LF
+	return key
     
 class App:
     VERSION_STR = "1.0.0"
@@ -172,7 +186,8 @@ class App:
 
         # use_unicode will enable the utf-8 mode for python2
         # see https://python-mpd2.readthedocs.io/en/latest/topics/advanced.html#unicode-handling
-        self.mpdclient = mpd.MPDClient(use_unicode=True)
+        self.mpdclient = mpd.MPDClient(use_unicode=False)
+        #self.mpdclient = mpd.MPDClient(use_unicode=True)
         self.mpdclient.connect("localhost", 6600)
 
         if self.verboseLevel >= 10:
@@ -247,8 +262,27 @@ Switches:
             #    else:
             #        end = True
             time.sleep(0.1)
+#            try:
             song = self.mpdclient.currentsong()
             status = self.mpdclient.status()
+#            except UnicodeDecodeError as err:
+#                print "Unicode error:", err
+            key = self.menu.getKey()
+            if key != 0:
+                print "\r\nkey:", key
+                if key & self.menu.KEY_PREV:
+                    print "prev"
+                    self.mpdclient.previous()
+                if key & self.menu.KEY_NEXT:
+                    print "next"
+                    self.mpdclient.next()
+                if key & self.menu.KEY_PLAY:
+                    if status['state'] == 'play':
+                        print "pause"
+                        self.mpdclient.pause()
+                    else:
+                        print "play"
+                        self.mpdclient.play()
             if 'elapsed' in status:
                 elapsed_min = float (status['elapsed']) / 60
                 elapsed_sec = float (status['elapsed']) % 60
@@ -328,8 +362,10 @@ Switches:
                     self.menu.setVolume(int(mpdvolume))
             if self.enablePrint:
 		print "%i%%" % volume,
-                print timeTxt.encode('utf-8'),
-                print titleTxt.encode('utf-8'),
+                print timeTxt,
+                print titleTxt,
+                #print timeTxt.encode('utf-8'),
+                #print titleTxt.encode('utf-8'),
             #print filename, name, title,
             prevTimeTxt = timeTxt
             prevTitleTxt = titleTxt
