@@ -2,7 +2,7 @@
 # Menu for internet radio
 #
 # Code starts: 2019-10-23 13:30:57
-# Last modify: 2019-11-07 18:45:30 ivanovp {Time-stamp}
+# Last modify: 2019-11-07 19:13:27 ivanovp {Time-stamp}
 
 import mpd
 import time
@@ -14,7 +14,7 @@ import getopt
 #import array
 import serial
 
-LAST_UPDATE_STR = "Last update: 2019-11-07 18:45:30 ivanovp {Time-stamp}"
+LAST_UPDATE_STR = "Last update: 2019-11-07 19:13:27 ivanovp {Time-stamp}"
 
 if sys.hexversion >= 0x3000000:
     print "Python interpreter 2.x is needed."
@@ -95,7 +95,8 @@ class MenuControl:
     def sendCommand (self, command):
         answer = 0
         if self.serial is not None and self.serial.isOpen ():
-            cmd = command.encode(self.CODESET)
+            cmd = command
+            #cmd = command.encode(self.CODESET)
             #print "\r\n[%s]\r\n" % cmd
             self.serial.write (cmd + "\n")
             time.sleep (0.001)
@@ -244,6 +245,7 @@ Switches:
         prevTimeTxt = ""
         titleTxt = ""
         prevTitleTxt = ""
+        state = ""
         mpdvolume = 0
         status = self.mpdclient.status()
         if 'volume' in status:
@@ -349,6 +351,15 @@ Switches:
                 else:
                     self.menu.setFont(self.menu.FONT_SMALL)
                     self.menu.printStr(0, 4, timeTxt)
+            if state != status['state']:
+                self.menu.setFont(self.menu.FONT_SMALL)
+                if status['state'] == 'play':
+                    self.menu.printStr(0, 63 - 9, "\x80")
+                elif status['state'] == 'pause':
+                    self.menu.printStr(0, 63 - 9, "\x82")
+                else:
+                    self.menu.printStr(0, 63 - 9, "\x81")
+                state = status['state']
             (volume, volumeChanged) = self.menu.getVolume()
             if volumeChanged:
                 # volume changed with the knob
