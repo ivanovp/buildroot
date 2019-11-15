@@ -2,7 +2,7 @@
 # Menu for internet radio
 #
 # Code starts: 2019-10-23 13:30:57
-# Last modify: 2019-11-07 19:13:27 ivanovp {Time-stamp}
+# Last modify: 2019-11-15 19:21:58 ivanovp {Time-stamp}
 
 import mpd
 import time
@@ -14,7 +14,7 @@ import getopt
 #import array
 import serial
 
-LAST_UPDATE_STR = "Last update: 2019-11-07 19:13:27 ivanovp {Time-stamp}"
+LAST_UPDATE_STR = "Last update: 2019-11-15 19:21:58 ivanovp {Time-stamp}"
 
 if sys.hexversion >= 0x3000000:
     print "Python interpreter 2.x is needed."
@@ -213,6 +213,44 @@ Switches:
   -v: Set verbose level. Range: 0..20
 """ % (self.DEFAULT_SERIAL_PORT)
 
+#import stat
+#import os.stat
+#    def disk_exists(self,path):
+#        try:
+#            return stat.S_ISBLK(os.stat(path).st_mode)
+#        except:
+#            return False
+
+    def disk_exists(self,path):
+        return os.path.exists(path)
+
+    def mount (self, path):
+        print "mounting %s" % path,
+        ret = not os.system("mount -t vfat -o ro %s /var/lib/mpd/music/mst" % path)
+        if ret:
+            print "OK"
+        else:
+            print "Error!"
+        return ret
+
+    def umount (self):
+#        # automatically unmounted when removing
+#        return True
+        print "unmounting",
+        ret = os.system("umount /var/lib/mpd/music/mst")
+        if ret:
+            print "OK"
+        else:
+            print "Error!"
+        return ret
+
+    def printDisk(self, disk):
+        self.menu.setFont(self.menu.FONT_SMALL)
+        if disk:
+            self.menu.printStr(120, 55, 'D')
+        else:
+            self.menu.printStr(120, 55, '.')
+
     def run (self):
         self.menu = MenuControl (self.serialPort, None, self.verboseLevel)
         self.menu.clearScreen()
@@ -254,6 +292,8 @@ Switches:
 	(volume, volumeChanged) = self.menu.getVolume()
 	font = -1
 	prevFont = -1
+        disk = False
+        prevDisk = False
         while True:
             #self.mpdclient.idle()
             end = False
@@ -276,8 +316,12 @@ Switches:
                     print "prev"
                     self.mpdclient.previous()
                 if key & self.menu.KEY_NEXT:
-                    print "next"
-                    self.mpdclient.next()
+                    if status['state'] == 'play':
+                        print "next"
+                        self.mpdclient.next()
+                    else:
+                        print "play"
+                        self.mpdclient.play()
                 if key & self.menu.KEY_PLAY:
                     if status['state'] == 'play':
                         print "pause"
@@ -332,6 +376,7 @@ Switches:
                 self.menu.printStr(0, 25, titleTxt)
                 self.menu.setVolume(int(mpdvolume))
                 #self.menu.printStr(0, 8, titleTxt)
+                self.printDisk(disk)
             else:
 		if self.enablePrint:
                     print "\r",
@@ -360,6 +405,23 @@ Switches:
                 else:
                     self.menu.printStr(0, 63 - 9, "\x81")
                 state = status['state']
+            if self.disk_exists("/dev/sda1"):
+                if not disk:
+                    self.mount("/dev/sda1")
+                    disk = True
+            elif self.disk_exists("/dev/sda"):
+                if not disk:
+                    #disk = self.mount("/dev/sda")
+                    self.mount("/dev/sda")
+                    disk = True
+            elif disk:
+                # disk removed
+                #disk = self.umount()
+                self.umount()
+                disk = False
+            if disk != prevDisk:
+                self.printDisk(disk)
+                prevDisk = disk
             (volume, volumeChanged) = self.menu.getVolume()
             if volumeChanged:
                 # volume changed with the knob
