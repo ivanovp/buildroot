@@ -239,6 +239,7 @@ F:	package/python*
 F:	package/snmpclitools/
 F:	package/spdlog/
 F:	package/uftp/
+F:	package/uvw/
 F:	package/zeromq/
 
 N:	Ash Charles <ashcharles@gmail.com>
@@ -460,6 +461,7 @@ N:	Brock Williams <brock@cottonwoodcomputer.com>
 F:	package/pdmenu/
 
 N:	Carlo Caione <carlo.caione@gmail.com>
+F:	package/jailhouse/
 F:	package/sunxi-boards/
 
 N:	Carlos Santos <unixmania@gmail.com>
@@ -693,6 +695,7 @@ F:	package/eudev/
 F:	package/execline/
 F:	package/hicolor-icon-theme/
 F:	package/jemalloc/
+F:	package/mdevd/
 F:	package/meson/
 F:	package/ninja/
 F:	package/pkg-meson.mk
@@ -801,10 +804,6 @@ F:	package/libmaxminddb/
 F:	package/openzwave/
 
 N:	Fabrice Fontaine <fontaine.fabrice@gmail.com>
-F:	package/alljoyn/
-F:	package/alljoyn-base/
-F:	package/alljoyn-tcl/
-F:	package/alljoyn-tcl-base/
 F:	package/boinc/
 F:	package/cairo/
 F:	package/duktape/
@@ -888,7 +887,9 @@ F:	package/ser2net/
 
 N:	Francois Perrad <francois.perrad@gadz.org>
 F:	board/olimex/a20_olinuxino
+F:	board/olimex/imx233_olinuxino/
 F:	configs/olimex_a20_olinuxino_*
+F:	configs/olimex_imx233_olinuxino_defconfig
 F:	package/4th/
 F:	package/cgilua/
 F:	package/chipmunk/
@@ -1046,6 +1047,7 @@ F:	package/python-sip/
 N:	Heiko Thiery <heiko.thiery@gmail.com>
 F:	package/libnetconf2/
 F:	package/libyang/
+F:	package/sysrepo/
 
 N:	Henrique Camargo <henrique@henriquecamargo.com>
 F:	package/json-glib/
@@ -1389,6 +1391,11 @@ F:	package/ti-sgx-demos/
 F:	package/ti-sgx-km/
 F:	package/ti-sgx-um/
 
+N:	Louis Aussedat <aussedat.louis@gmail.com>
+F:	board/friendlyarm/nanopi-neo-plus2/
+F:	configs/friendlyarm_nanopi_neo_plus2_defconfig
+F:	package/python-tqdm/
+
 N:	Louis-Paul Cordier <lpdev@cordier.org>
 F:	package/intel-gmmlib/
 F:	package/intel-mediadriver/
@@ -1480,7 +1487,7 @@ F:	package/lynx/
 N:	Mario Rugiero <mrugiero@gmail.com>
 F:	package/ratpoison/
 
-N:	Mark Corbin <mark.corbin@embecosm.com>
+N:	Mark Corbin <mark@dibsco.co.uk>
 F:	arch/arch.mk.riscv
 F:	arch/Config.in.riscv
 F:	board/qemu/riscv32-virt/
@@ -1855,6 +1862,7 @@ F:	package/sedutil/
 F:	package/tpm2-totp/
 F:	package/triggerhappy/
 F:	package/wireguard/
+F:	support/testing/tests/package/test_docker_compose.py
 
 N:	Peter Seiderer <ps.report@gmx.net>
 F:	board/raspberrypi/
@@ -1888,6 +1896,7 @@ N:	Petr Kulhavy <brain@jikos.cz>
 F:	package/linuxptp/
 
 N:	Petr Vorel <petr.vorel@gmail.com>
+F:	package/ima-evm-utils/
 F:	package/iproute2/
 F:	package/iputils/
 F:	package/linux-backports/
@@ -2035,6 +2044,7 @@ F:	package/mcelog/
 F:	package/mesa3d/
 F:	package/minetest/
 F:	package/minetest-game/
+F:	package/ogre/
 F:	package/openpowerlink/
 F:	package/physfs/
 F:	package/piglit/
@@ -2288,11 +2298,11 @@ F:	package/ascii-invaders/
 
 N:	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
 F:	arch/Config.in.arm
-F:	board/stmicroelectronics/stm32mp157-dk/
+F:	board/stmicroelectronics/stm32mp157c-dk2/
 F:	boot/boot-wrapper-aarch64/
 F:	boot/grub2/
 F:	boot/gummiboot/
-F:	configs/stm32mp157_dk_defconfig
+F:	configs/stm32mp157c_dk2_defconfig
 F:	package/android-tools/
 F:	package/b43-firmware/
 F:	package/b43-fwcutter/
@@ -2497,6 +2507,7 @@ F:	package/libsocketcan/
 F:	package/libubox/
 F:	package/libuci/
 F:	package/linux-firmware/
+F:	package/linux-serial-test/
 F:	package/modem-manager/
 F:	package/nftables/
 F:	package/nuttcp/
@@ -2526,7 +2537,3 @@ F:	package/qjson/
 F:	package/quazip/
 F:	package/shapelib/
 F:	package/tinc/
-
-N:  Aussedat Louis <aussedat.louis@gmail.com>
-F:	board/friendlyarm/nanopi-neo-plus2/
-F:	configs/friendlyarm_nanopi_neo_plus2_defconfig
