@@ -2,7 +2,7 @@
 # Menu for internet radio
 #
 # Code starts: 2019-10-23 13:30:57
-# Last modify: 2019-11-16 18:24:53 ivanovp {Time-stamp}
+# Last modify: 2019-11-27 22:04:15 ivanovp {Time-stamp}
 
 import mpd
 import time
@@ -14,7 +14,7 @@ import getopt
 #import array
 import serial
 
-LAST_UPDATE_STR = "Last update: 2019-11-16 18:24:53 ivanovp {Time-stamp}"
+LAST_UPDATE_STR = "Last update: 2019-11-27 22:04:15 ivanovp {Time-stamp}"
 
 if sys.hexversion >= 0x3000000:
     print "Python interpreter 2.x is needed."
@@ -267,7 +267,7 @@ Switches:
     def printDisk(self, disk):
         self.menu.setFont(self.menu.FONT_SMALL)
         if disk:
-            self.menu.printStr(120, 55, 'D')
+            self.menu.printStr(120, 55, 'U')
         else:
             self.menu.printStr(120, 55, '.')
 
