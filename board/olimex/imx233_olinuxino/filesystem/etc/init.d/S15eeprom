@@ -3,17 +3,14 @@ DAEMON="eeprom"
 
 start() {
 	printf "Starting $DAEMON: "
-    modprobe i2c-dev
-    modprobe at24
-    echo "24c32 0x50" > /sys/class/i2c-dev/i2c-0/device/new_device
-#    /root/ds1307_init.sh && /root/ds1307_get.sh \
-#		&& echo "OK" || echo "FAIL"
+    modprobe i2c-dev && modprobe at24 && \
+    echo "24c32 0x50" > /sys/class/i2c-dev/i2c-0/device/new_device \
+    && echo "OK" || echo "FAIL"
 }
 
 stop() {
 	printf "Stopping $DAEMON: "
-#    /root/ds1307_set.sh \
-#		&& echo "OK" || echo "FAIL"
+    rmmod at24 && echo "OK" || echo "FAIL"
 }
 
 case "$1" in
