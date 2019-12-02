@@ -9,7 +9,7 @@ start() {
 
 stop() {
 	printf "Stopping $DAEMON: "
-    /root/ds1307_put.sh \
+    /root/ds1307_set.sh \
 		&& echo "OK" || echo "FAIL"
 }
 
