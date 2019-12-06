@@ -1,0 +1,181 @@
+/* vim:set shiftwidth=2: */
+body {
+  color: black;
+  background-color: white;
+  /* background-image: url(bigback.png); 
+  background-repeat: no-repeat;
+  background-position: left bottom; */
+  font: normal 10pt verdana, geneva, arial, helvetica, sans-serif;
+  padding: 0;
+  margin: 20px;
+}
+
+#main {
+  background: #fff;
+}
+
+#menu {
+  /* float: top; */
+  background: #aabbcc;
+  margin: 0;
+  padding-left: 10px;
+  height: 23px; 
+  padding: 0;
+  margin-bottom: 10px;
+}
+
+#menu p { 
+  font: normal 12pt georgia;
+}
+
+#home {
+  float: left;
+  width: 100px;
+  height: 23px;
+  background: url(pics/menu/home.png) no-repeat top left;
+}
+#home:hover {
+  background: url(pics/menu/home_hover.png); 
+}
+#home span {
+  display: none
+}
+
+#docs {
+  float: left;
+  width: 100px;
+  height: 23px;
+  background: url(pics/menu/docs.png) no-repeat top left;
+}
+#docs:hover {
+  background: url(pics/menu/docs_hover.png); 
+}
+#docs span {
+  display: none
+}
+
+#download {
+  float: left;
+  width: 100px;
+  height: 23px;
+  background: url(pics/menu/download.png) no-repeat top left;
+}
+#download:hover {
+  background: url(pics/menu/download_hover.png); 
+}
+#download span {
+  display: none
+}
+
+#screenshot {
+  float: left;
+  width: 100px;
+  height: 23px;
+  background: url(pics/menu/screenshot.png) no-repeat top left;
+}
+#screenshot:hover {
+  background: url(pics/menu/screenshot_hover.png); 
+}
+#screenshot span {
+  display: none
+}
+
+/* Application: Common Code */
+
+/*.rollover { display: block; } /* Allow setting widths and heights */
+/*.rollover img { width: 100%; height: 100%; border: 0; } /* only set width and height once */
+/*.rollover:hover { visibility: visible; } /* sets any property for the :hover state */
+/*.rollover:hover img { visibility: hidden; } /* 'rolls over' the image */
+
+#content {
+  border: 1px solid #000; 
+}
+
+#footer {
+  border-bottom: 1px solid #000; 
+  border-left: 1px solid #000; 
+  border-right: 1px solid #000; 
+  float: right;
+  width: 30em;
+  background: #c9c9c9;
+  padding: 10px;
+  margin: 0;
+}
+
+#w3c {
+  float: left;
+  margin: 10px
+}
+
+p,h1,h2,pre {
+  margin: 0px 10px 10px 10px;
+}
+
+h1 {
+  font-size: 16pt georgia;
+  padding-top: 10px;
+}
+h2 {
+  font-size: 14pt georgia;
+  padding-top: 10px;
+}
+
+acronym {
+  cursor: help;
+}
+
+a { 
+  color: #0000ff; 
+  text-decoration: none; 
+}
+a:hover { 
+  color: #0000ff; 
+  text-decoration: underline; 
+}
+a:visited { 
+  color: #803040;
+}
+a:active { 
+  color: #405060;
+}
+
+#main table { 
+  border-style: none; 
+  font: normal 11pt verdana, geneva, arial, helvetica, sans-serif;
+}
+#main th {
+  background-color: #cbcdd5; 
+  padding: 2px 2px 2px 2px;
+}
+#main tr { 
+  background-color: #ebedf5;
+}
+/*#main tr:hover { 
+  background-color: #ccffcc;
+}*/
+
+#main #form {
+  padding: 0px 0px 0px 10px;
+  border-style: none;
+  border-width: 0px;
+}
+
+#main #form tr { 
+  background-color: #fff;
+}
+
+#main input { 
+  border-style: solid; 
+  border-width: 1px;
+  border-color: #cccccc 
+}
+#main #button { 
+  border-style: solid; 
+  border-width: 1px;
+  border-color: #cccccc; 
+  background-color: #dbddef; 
+}
+#main #button:hover { 
+  background-color: #ebedff;
+}
+
