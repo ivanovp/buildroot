@@ -2,7 +2,7 @@
 # Menu for internet radio
 #
 # Code starts: 2019-10-23 13:30:57
-# Last modify: 2019-11-27 22:04:15 ivanovp {Time-stamp}
+# Last modify: 2019-12-08 09:00:00 ivanovp {Time-stamp}
 
 import mpd
 import time
@@ -10,18 +10,19 @@ import sys
 import os
 import sys
 import getopt
-#import re
+import re
 #import array
 import serial
+import subprocess
 
-LAST_UPDATE_STR = "Last update: 2019-11-27 22:04:15 ivanovp {Time-stamp}"
+LAST_UPDATE_STR = "Last update: 2019-12-08 09:00:00 ivanovp {Time-stamp}"
 
 if sys.hexversion >= 0x3000000:
     print "Python interpreter 2.x is needed."
     sys.exit (3)
 
 class MenuControl:
-    SERIAL_TIMEOUT_SEC = 0.1
+    SERIAL_TIMEOUT_SEC = 1
     SERIAL_PORT = "/dev/ttyAPP0"
 #    SERIAL_BAUD_RATE = 115200
     SERIAL_BAUD_RATE = 9600
@@ -246,6 +247,8 @@ Switches:
 
     def mount (self, path):
         print "mounting %s" % path,
+        if not os.path.exists("/var/lib/mpd/music/mst"):
+            os.mkdir("/var/lib/mpd/music/mst")
         ret = not os.system("mount -t vfat -o ro %s /var/lib/mpd/music/mst" % path)
         if ret:
             print "OK"
@@ -270,6 +273,9 @@ Switches:
             self.menu.printStr(120, 55, 'U')
         else:
             self.menu.printStr(120, 55, '.')
+
+    def runCommand(self, command):
+        return subprocess.check_output(command.split(" "))
 
     def run (self):
         self.menu = MenuControl (self.serialPort, None, self.verboseLevel)
@@ -373,7 +379,7 @@ Switches:
                         print "play"
                         self.mpdclient.play()
                 if menuState == 0 and key & self.menu.KEY_MENU:
-                    choose = self.menu.showMenu("Seek", "Power off", "Back")
+                    choose = self.menu.showMenu("Seek", "Power off", "Show IP", "WiFi AP mode", "Back")
                     menuState = 1
             if 'elapsed' in status:
                 elapsed_min = float (status['elapsed']) / 60
@@ -490,6 +496,42 @@ Switches:
                         print "power off"
                         os.system("poweroff")
                     elif activatedMenu == 2:
+                        print "Show IP"
+                        output = self.runCommand("iwconfig wlan0")
+                        ssid = "?"
+                        link_quality = "?"
+                        signal_level = "?"
+                        ip = "?"
+                        # .*? -> non-greedy .*
+                        m = re.search("ESSID:\"(.*?)\"", output)
+                        if m:
+                            ssid = m.group(1)
+                        m = re.search(r"Link Quality=(\S+)", output)
+                        if m:
+                            link_quality = m.group(1)
+                        m = re.search(r"Signal level=(\S+)\s+(\S+)", output)
+                        if m:
+                            signal_level = m.group(1) + " " + m.group(2)
+                        output = self.runCommand("ip addr show dev wlan0")
+                        #m = re.search(r"inet (\n+.\n+.\n+.\n+)", output)
+                        m = re.search(r"inet (\S+)", output)
+                        if m:
+                            ip = m.group(1)
+                        self.menu.clearScreen()
+                        self.menu.printStr(0, 0, "SSID: %s" % ssid)
+                        self.menu.printStr(0, 10, "Link quality: %s" % link_quality)
+                        self.menu.printStr(0, 20, "Signal level: %s" % signal_level)
+                        self.menu.printStr(0, 30, "IP: %s" % ip)
+                        time.sleep (10)
+                    elif activatedMenu == 3:
+                        print "WiFi AP mode"
+                        self.menu.clearScreen()
+                        self.menu.printStr(0, 0, "SSID: Radio")
+                        self.menu.printStr(0, 10, "Pwd: radiogaga")
+                        self.menu.printStr(0, 20, "IP: 192.168.10.1")
+                        os.system("/root/wifi_ap.sh")
+                        time.sleep (10)
+                    elif activatedMenu == 4:
                         print "back"
                         # do nothing
                     # go back to cover
