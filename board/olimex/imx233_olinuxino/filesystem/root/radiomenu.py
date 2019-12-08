@@ -2,7 +2,7 @@
 # Menu for internet radio
 #
 # Code starts: 2019-10-23 13:30:57
-# Last modify: 2019-12-08 09:00:00 ivanovp {Time-stamp}
+# Last modify: 2019-12-08 12:21:00 ivanovp {Time-stamp}
 
 import mpd
 import time
@@ -15,7 +15,7 @@ import re
 import serial
 import subprocess
 
-LAST_UPDATE_STR = "Last update: 2019-12-08 09:00:00 ivanovp {Time-stamp}"
+LAST_UPDATE_STR = "Last update: 2019-12-08 12:21:00 ivanovp {Time-stamp}"
 
 if sys.hexversion >= 0x3000000:
     print "Python interpreter 2.x is needed."
@@ -270,12 +270,47 @@ Switches:
     def printDisk(self, disk):
         self.menu.setFont(self.menu.FONT_SMALL)
         if disk:
-            self.menu.printStr(120, 55, 'U')
+            status = "U"
         else:
-            self.menu.printStr(120, 55, '.')
+            status = "."
+        self.menu.printStr(112, 55, status)
+    
+    def printLink(self, link):
+        self.menu.setFont(self.menu.FONT_SMALL)
+        if link:
+            status = "L"
+        else:
+            status = "."
+        self.menu.printStr(120, 55, status)
 
     def runCommand(self, command):
         return subprocess.check_output(command.split(" "))
+
+    def updateDisk(self, disk):
+        if self.disk_exists("/dev/sda1"):
+            if not disk:
+                self.mount("/dev/sda1")
+                disk = True
+        elif self.disk_exists("/dev/sda"):
+            if not disk:
+                #disk = self.mount("/dev/sda")
+                self.mount("/dev/sda")
+                disk = True
+        elif disk:
+            # disk removed
+            #disk = self.umount()
+            self.umount()
+            disk = False
+        return disk
+
+    def updateLink(self):
+        link = False
+        output = self.runCommand("ip addr show wlan0")
+        m = re.search(r"inet (\S+)", output)
+        if m:
+            #ip = m.group(1)
+            link = True
+        return link
 
     def run (self):
         self.menu = MenuControl (self.serialPort, None, self.verboseLevel)
@@ -320,11 +355,13 @@ Switches:
 	prevFont = -1
         disk = False
         prevDisk = False
+        prevLink = False
         menuState = 0
         forcePrintTitle = True
         forcePrintTime = True
         forcePrintStatus = True
         forcePrintDisk = True
+        forcePrintLink = True
         while True:
             #self.mpdclient.idle()
             end = False
@@ -340,20 +377,8 @@ Switches:
             status = self.mpdclient.status()
 #            except UnicodeDecodeError as err:
 #                print "Unicode error:", err
-            if self.disk_exists("/dev/sda1"):
-                if not disk:
-                    self.mount("/dev/sda1")
-                    disk = True
-            elif self.disk_exists("/dev/sda"):
-                if not disk:
-                    #disk = self.mount("/dev/sda")
-                    self.mount("/dev/sda")
-                    disk = True
-            elif disk:
-                # disk removed
-                #disk = self.umount()
-                self.umount()
-                disk = False
+            disk = self.updateDisk(disk)
+            link = self.updateLink()
             key = self.menu.getKey()
             if key != 0:
                 print "\r\nkey:", key
@@ -437,6 +462,7 @@ Switches:
                     self.menu.setVolume(int(mpdvolume))
                     #self.menu.printStr(0, 8, titleTxt)
                     self.printDisk(disk)
+                    self.printLink(link)
                     forcePrintTitle = False
                     # force printing the other ones, because screen was cleared
                     forcePrintStatus = True
@@ -462,17 +488,21 @@ Switches:
                 if state != status['state'] or forcePrintStatus:
                     self.menu.setFont(self.menu.FONT_SMALL)
                     if status['state'] == 'play':
-                        self.menu.printStr(0, 63 - 9, "\x80")
+                        self.menu.printStr(0, 54, "\x80")
                     elif status['state'] == 'pause':
-                        self.menu.printStr(0, 63 - 9, "\x82")
+                        self.menu.printStr(0, 54, "\x82")
                     else:
-                        self.menu.printStr(0, 63 - 9, "\x81")
+                        self.menu.printStr(0, 54, "\x81")
                     state = status['state']
                     forcePrintStatus = False
                 if disk != prevDisk or forcePrintDisk:
                     self.printDisk(disk)
                     prevDisk = disk
                     forcePrintDisk = False
+                if link != prevLink or forcePrintLink:
+                    self.printLink(link)
+                    prevLink = link
+                    forcePrintLink = False
                 (volume, volumeChanged) = self.menu.getVolume()
                 if volumeChanged:
                     # volume changed with the knob
