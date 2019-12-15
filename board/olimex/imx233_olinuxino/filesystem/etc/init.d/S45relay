@@ -1,0 +1,35 @@
+#!/bin/sh
+DAEMON="relay"
+# GPIO of audio relay control
+GPIO=53
+echo $GPIO >/sys/class/gpio/export 2>/dev/null
+echo out >/sys/class/gpio/gpio$GPIO/direction 2>/dev/null
+
+start() {
+	printf "Starting $DAEMON: "
+	echo 1 >/sys/class/gpio/gpio$GPIO/value && \
+	echo "OK" || echo "FAIL"
+}
+
+stop() {
+	printf "Stopping $DAEMON: "
+	echo 0 >/sys/class/gpio/gpio$GPIO/value && \
+	echo "OK" || echo "FAIL"
+}
+
+case "$1" in
+	start)
+		start
+		;;
+	stop)
+		stop
+		;;
+	restart|reload)
+		stop
+		sleep 1
+		start
+		;;
+	*)
+		echo "Usage: $0 {start|stop|restart}"
+		exit 1
+esac
