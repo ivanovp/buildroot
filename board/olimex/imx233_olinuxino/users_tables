@@ -1,0 +1,1 @@
+ftp:x:900:900:Anonymous FTP User,,,:/var/lib/mpd/music:/bin/false
