@@ -3,7 +3,7 @@ DAEMON="modprobe"
 
 start() {
 	printf "Starting $DAEMON: "
-	modprobe rtlwifi \
+	modprobe rtlwifi && \
 	modprobe rtl8192c_common && \
 	modprobe rtl_usb && \
 	modprobe rtl8192cu && \
