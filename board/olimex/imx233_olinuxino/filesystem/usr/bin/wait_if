@@ -1,0 +1,20 @@
+#!/bin/sh
+if [ "$1" == "" ]; then
+  echo "Usage: $0 <network interface>"
+  exit
+fi
+
+IF=$1
+CNTR=10
+RUNNING=`ifconfig $IF | grep RUNNING`
+while [ "$RUNNING" == "" ]; do 
+  echo "$IF is not up! Retry: $CNTR"
+  sleep 1
+  RUNNING=`ifconfig $IF | grep RUNNING`
+  CNTR=$(( $CNTR - 1 ))
+  if [ $CNTR == 0 ]; then
+    echo "Timed out!"
+    exit
+  fi
+done
+echo "$IF is up!"
