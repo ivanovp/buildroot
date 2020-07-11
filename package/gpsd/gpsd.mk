@@ -56,8 +56,8 @@ GPSD_SCONS_OPTS += usb=no
 endif
 
 # If bluetooth is available build it before so the package can use it
-ifeq ($(BR2_PACKAGE_BLUEZ_UTILS),y)
-GPSD_DEPENDENCIES += bluez_utils
+ifeq ($(BR2_PACKAGE_BLUEZ5_UTILS),y)
+GPSD_DEPENDENCIES += bluez5_utils
 else
 GPSD_SCONS_OPTS += bluez=no
 endif
@@ -200,7 +200,10 @@ ifeq ($(BR2_PACKAGE_GPSD_MAX_DEV),y)
 GPSD_SCONS_OPTS += max_devices=$(BR2_PACKAGE_GPSD_MAX_DEV_VALUE)
 endif
 
-GPSD_SCONS_ENV += LDFLAGS="$(GPSD_LDFLAGS)" CFLAGS="$(GPSD_CFLAGS)"
+GPSD_SCONS_ENV += \
+	LDFLAGS="$(GPSD_LDFLAGS)" \
+	CFLAGS="$(GPSD_CFLAGS)" \
+	CCFLAGS="$(GPSD_CFLAGS)"
 
 define GPSD_BUILD_CMDS
 	(cd $(@D); \
